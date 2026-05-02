@@ -1,16 +1,35 @@
-import sql from "@/app/api/utils/sql";
+import sql from '@/app/api/utils/sql';
+import { runStructured } from '@/app/api/utils/anthropic';
+import { gauntletSchema } from '@/app/api/utils/schemas';
 
-// Just saves the result — AI call happens on the frontend
 export async function POST(request) {
   try {
-    const { idea, gauntlet } = await request.json();
-
-    if (!idea || !gauntlet) {
-      return Response.json(
-        { error: "idea and gauntlet are required" },
-        { status: 400 },
-      );
+    const { idea } = await request.json();
+    if (!idea) {
+      return Response.json({ error: 'idea is required' }, { status: 400 });
     }
+
+    const prompt = `You are an AI system called "The Gauntlet."
+Stress-test this startup/product idea from four adversarial perspectives, then synthesize a final decision.
+
+Roles:
+1. Investor — market, ROI, moat
+2. Competitor — how to attack and beat this
+3. Customer — why people won't buy
+4. Builder — execution difficulty and hidden complexity
+5. The Judge — final synthesis
+
+RULES: Be concise and sharp. No generic advice. No repetition across sections. Prioritize realism.
+
+INPUT IDEA: ${idea}
+
+Return structured output with all five perspectives.`;
+
+    const gauntlet = await runStructured({
+      prompt,
+      schema: gauntletSchema,
+      schemaName: 'gauntlet_evaluation',
+    });
 
     const [saved] = await sql`
       INSERT INTO evaluations (
@@ -38,7 +57,7 @@ export async function POST(request) {
 
     return Response.json({ ...saved, gauntlet });
   } catch (error) {
-    console.error("Save evaluation error:", error);
+    console.error('Evaluate error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
@@ -49,7 +68,7 @@ export async function GET() {
       await sql`SELECT * FROM evaluations ORDER BY created_at DESC LIMIT 10`;
     return Response.json(history);
   } catch (error) {
-    console.error("History error:", error);
+    console.error('History error:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }

@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { runGauntlet, runFollowUp, runMemo } from "@/utils/aiCalls";
 import { Navigation } from "@/components/Navigation/Navigation";
 import { Footer } from "@/components/Footer/Footer";
 import { HeroSection } from "@/components/Hero/HeroSection";
@@ -38,17 +37,14 @@ export default function GauntletPage() {
 
   const mutation = useMutation({
     mutationFn: async (newIdea) => {
-      // Step 1: AI call from the browser (no project ID issue)
-      const gauntlet = await runGauntlet(newIdea);
-      // Step 2: Save to DB
       const res = await fetch("/api/evaluate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ idea: newIdea, gauntlet }),
+        body: JSON.stringify({ idea: newIdea }),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to save evaluation");
+        throw new Error(err.error || "Evaluation failed");
       }
       return res.json();
     },
@@ -60,17 +56,14 @@ export default function GauntletPage() {
 
   const followupMutation = useMutation({
     mutationFn: async ({ evaluationId, rawIdea, gauntlet }) => {
-      // Step 1: AI call from the browser
-      const followup = await runFollowUp(rawIdea, gauntlet);
-      // Step 2: Save to DB
       const res = await fetch("/api/followup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ evaluationId, followup }),
+        body: JSON.stringify({ evaluationId, idea: rawIdea, gauntlet }),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to save follow-up");
+        throw new Error(err.error || "Follow-up failed");
       }
       return res.json();
     },
@@ -78,17 +71,14 @@ export default function GauntletPage() {
 
   const memoMutation = useMutation({
     mutationFn: async ({ evaluationId, followup, gauntlet, idea }) => {
-      // Step 1: AI call from the browser
-      const memo = await runMemo(idea, gauntlet, followup);
-      // Step 2: Save to DB
       const res = await fetch("/api/memo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ evaluationId, memo }),
+        body: JSON.stringify({ evaluationId, idea, gauntlet, followup }),
       });
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error || "Failed to save memo");
+        throw new Error(err.error || "Memo failed");
       }
       return res.json();
     },

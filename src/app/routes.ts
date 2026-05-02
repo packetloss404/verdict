@@ -49,6 +49,9 @@ function buildRouteTree(dir: string, basePath = ''): Tree {
 		const stat = statSync(filePath);
 
 		if (stat.isDirectory()) {
+			if (file.startsWith('__') || file === 'api' || file === 'errors') {
+				continue;
+			}
 			const childPath = basePath ? `${basePath}/${file}` : file;
 			const childNode = buildRouteTree(filePath, childPath);
 			node.children.push(childNode);
@@ -113,7 +116,7 @@ if (import.meta.env.DEV) {
 	}
 }
 const tree = buildRouteTree(__dirname);
-const notFound = route('*?', './__create/not-found.tsx');
+const notFound = route('*?', './not-found.tsx');
 const routes = [...generateRoutes(tree), notFound];
 
 export default routes;

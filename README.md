@@ -2,7 +2,7 @@
 
 An AI-powered idea evaluation app. Submit a startup or product idea and run it through a four-pass critique:
 
-1. **Gauntlet** — initial multi-angle critique
+1. **Gauntlet** — initial multi-angle critique (Investor / Competitor / Customer / Builder / Judge)
 2. **Follow-Up (No Mercy)** — deeper, harder questions
 3. **Memo** — synthesized investment-style memo
 4. **Final Directive** — full report
@@ -16,12 +16,14 @@ Past evaluations are stored and browsable from the History tab.
 - Vite + Bun
 - Tailwind CSS 3
 - TanStack Query
+- Anthropic SDK (Claude)
 - Neon (serverless Postgres)
-- `@auth/core` + `@hono/auth-js`
 
 ## Getting started
 
 ```bash
+cp .env.example .env
+# fill in ANTHROPIC_API_KEY and DATABASE_URL
 bun install
 bun run dev
 ```
@@ -30,6 +32,30 @@ Dev server runs on http://localhost:4000.
 
 ```bash
 bun run typecheck
+bun run build
+bun start
+```
+
+## Database
+
+A Neon Postgres connection string in `DATABASE_URL`. Expected table:
+
+```sql
+CREATE TABLE evaluations (
+  id              SERIAL PRIMARY KEY,
+  idea_text       TEXT NOT NULL,
+  verdict         TEXT,
+  why_market      TEXT,
+  why_model       TEXT,
+  why_moat        TEXT,
+  biggest_risk    TEXT,
+  save_improvement TEXT,
+  viability_score INTEGER,
+  gauntlet_result JSONB,
+  followup_result JSONB,
+  memo_result     JSONB,
+  created_at      TIMESTAMPTZ DEFAULT now()
+);
 ```
 
 ## Layout
@@ -38,29 +64,23 @@ bun run typecheck
 src/
   app/
     page.jsx          # main gauntlet flow
-    layout.jsx
-    root.tsx
+    layout.jsx        # QueryClient provider
+    root.tsx          # html shell + error boundary
     routes.ts         # file-based route generator
+    not-found.tsx
     api/
-      evaluate/       # POST/GET evaluations
-      followup/       # POST follow-up critique
-      memo/           # POST memo
-      auth/
+      evaluate/       # POST runs gauntlet + persists; GET returns history
+      followup/       # POST runs follow-up + persists
+      memo/           # POST runs memo + persists
+      utils/          # anthropic.js, schemas.js, sql.js
   components/         # Hero, IdeaInput, Results, FollowUp, Memo, Report, History, ...
-  utils/              # aiCalls, db client, helpers
-  client-integrations/
-plugins/              # vite plugins (render-id injection, console forwarding, layouts, ...)
-__create/             # server entry + auth scaffolding
-test/
+  config/
+server/               # Hono server entry + file-based API route loader
+plugins/              # vite plugins: aliases, hierarchical layouts, restart
 ```
 
-## Environment
+## Architecture notes
 
-`.env` holds `ANYTHING_PROJECT_TOKEN` (used by the AI integration). Add a Neon
-`DATABASE_URL` for the API routes that persist evaluations.
-
-## Origin
-
-Bootstrapped from anything.com's web + mobile scaffold; the mobile target was
-unused and has been removed. The `__create/` and `plugins/` directories
-preserve the original platform integration shims.
+- AI calls run **server-side** in `src/app/api/*/route.js`. The browser never sees the API key.
+- API routes are loaded from `src/app/api/**/route.js` via `server/route-builder.ts` and mounted under `/api`.
+- Page routes are generated from `src/app/**/page.jsx` via `src/app/routes.ts`.

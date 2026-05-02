@@ -37,37 +37,6 @@ export const Footer = ({ activeTab, setActiveTab }) => {
         VERDICT
       </span>
 
-      {/* Tabs */}
-      <div style={{ display: "flex", gap: 2 }}>
-        {[
-          { id: "new", label: "EVALUATE" },
-          { id: "history", label: "HISTORY" },
-        ].map(({ id, label }) => {
-          const active = activeTab === id;
-          return (
-            <button
-              key={id}
-              onClick={() => setActiveTab && setActiveTab(id)}
-              style={{
-                background: active ? "#0F1828" : "transparent",
-                border: `1px solid ${active ? "#0F1828" : "#DDD5C8"}`,
-                color: active ? "#FFFFFF" : "#9A8A78",
-                borderRadius: 3,
-                padding: "7px 18px",
-                fontSize: 9,
-                letterSpacing: "0.3em",
-                fontWeight: 700,
-                fontFamily: MONO,
-                cursor: "pointer",
-                transition: "all 0.15s",
-              }}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
-
       {/* Right — subtle tagline */}
       <span
         style={{

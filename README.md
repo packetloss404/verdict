@@ -7,7 +7,7 @@ An AI-powered idea evaluation app. Submit a startup or product idea and run it t
 3. **Memo** — synthesized investment-style memo
 4. **Final Directive** — full report
 
-Past evaluations are stored and browsable from the History tab.
+Past evaluations are persisted in Postgres for retrieval via `GET /api/evaluate`.
 
 ## Stack
 

@@ -1,6 +1,9 @@
-import sql from '@/app/api/utils/sql';
-import { runStructured } from '@/app/api/utils/anthropic';
-import { followupSchema } from '@/app/api/utils/schemas';
+import sql from '@/lib/sql';
+import { runStructured } from '@/lib/anthropic';
+import { followupSchema } from '@/lib/schemas';
+
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function POST(request) {
   try {

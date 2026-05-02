@@ -2,8 +2,14 @@
 Thumbs.db
 node_modules/
 
-# React Router
-.react-router/
+# Lockfiles (project uses bun; npm/pnpm/yarn lockfiles are local-only)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Next.js
+.next/
+.vercel
 build/
 dist/
 

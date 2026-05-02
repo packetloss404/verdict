@@ -11,13 +11,13 @@ Past evaluations are stored and browsable from the History tab.
 
 ## Stack
 
-- React Router 7 (file-based routing under `src/app/`)
-- Hono server (via `react-router-hono-server`)
-- Vite + Bun
+- Next.js 15 (app router)
+- React 18.3
 - Tailwind CSS 3
 - TanStack Query
 - Anthropic SDK (Claude)
 - Neon (serverless Postgres)
+- Bun for install/dev
 
 ## Getting started
 
@@ -61,26 +61,26 @@ CREATE TABLE evaluations (
 ## Layout
 
 ```
+app/
+  layout.tsx          # html shell + providers
+  providers.tsx       # QueryClient provider, Sonner toaster
+  page.jsx            # main gauntlet flow
+  not-found.tsx
+  globals.css
+  api/
+    evaluate/route.js # POST runs gauntlet + persists; GET returns history
+    followup/route.js # POST runs follow-up + persists
+    memo/route.js     # POST runs memo + persists
 src/
-  app/
-    page.jsx          # main gauntlet flow
-    layout.jsx        # QueryClient provider
-    root.tsx          # html shell + error boundary
-    routes.ts         # file-based route generator
-    not-found.tsx
-    api/
-      evaluate/       # POST runs gauntlet + persists; GET returns history
-      followup/       # POST runs follow-up + persists
-      memo/           # POST runs memo + persists
-      utils/          # anthropic.js, schemas.js, sql.js
   components/         # Hero, IdeaInput, Results, FollowUp, Memo, Report, History, ...
   config/
-server/               # Hono server entry + file-based API route loader
-plugins/              # vite plugins: aliases, hierarchical layouts, restart
+  lib/                # anthropic.js, schemas.js, sql.js (server-side helpers)
+  utils/              # styleHelpers.js
+  index.css
 ```
 
 ## Architecture notes
 
-- AI calls run **server-side** in `src/app/api/*/route.js`. The browser never sees the API key.
-- API routes are loaded from `src/app/api/**/route.js` via `server/route-builder.ts` and mounted under `/api`.
-- Page routes are generated from `src/app/**/page.jsx` via `src/app/routes.ts`.
+- AI calls run **server-side** in `app/api/*/route.js` (Next route handlers, `nodejs` runtime, `force-dynamic`). The browser never sees the API key.
+- Routes and pages are handled natively by the Next.js app router — no custom file-based route generator.
+- Server-only helpers live in `src/lib/` and are imported via the `@/lib/*` path alias.

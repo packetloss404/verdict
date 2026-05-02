@@ -2,8 +2,8 @@
 Thumbs.db
 node_modules/
 
-# Lockfiles (project uses bun; npm/pnpm/yarn lockfiles are local-only)
-package-lock.json
+# Lockfiles (project uses npm; other lockfiles are local-only)
+bun.lock
 yarn.lock
 pnpm-lock.yaml
 

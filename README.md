@@ -17,23 +17,22 @@ Past evaluations are stored and browsable from the History tab.
 - TanStack Query
 - Anthropic SDK (Claude)
 - Neon (serverless Postgres)
-- Bun for install/dev
 
 ## Getting started
 
 ```bash
 cp .env.example .env
 # fill in ANTHROPIC_API_KEY and DATABASE_URL
-bun install
-bun run dev
+npm install
+npm run dev
 ```
 
 Dev server runs on http://localhost:4000.
 
 ```bash
-bun run typecheck
-bun run build
-bun start
+npm run typecheck
+npm run build
+npm start
 ```
 
 ## Database

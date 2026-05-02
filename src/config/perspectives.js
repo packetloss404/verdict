@@ -1,0 +1,38 @@
+export const PERSPECTIVES = [
+  {
+    key: "investor",
+    label: "Investor",
+    subtitle: "Market · ROI · Moat",
+    icon: "TrendingUp",
+    accent: "#2563EB",
+    bg: "#EFF6FF",
+    border: "#BFDBFE",
+  },
+  {
+    key: "competitor",
+    label: "Competitor",
+    subtitle: "Attack Strategy",
+    icon: "Swords",
+    accent: "#DC2626",
+    bg: "#FEF2F2",
+    border: "#FECACA",
+  },
+  {
+    key: "customer",
+    label: "Customer",
+    subtitle: "Adoption Skeptic",
+    icon: "ShoppingCart",
+    accent: "#D97706",
+    bg: "#FFFBEB",
+    border: "#FDE68A",
+  },
+  {
+    key: "builder",
+    label: "Builder",
+    subtitle: "Execution Reality",
+    icon: "Wrench",
+    accent: "#7C3AED",
+    bg: "#F5F3FF",
+    border: "#DDD6FE",
+  },
+];
